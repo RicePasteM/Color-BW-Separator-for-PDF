@@ -2,6 +2,9 @@
 
 This tool is used to separate color and black & white pages from a PDF file into two separate PDF files.
 
+## Languages
+<a href="./README-zh_cn.md">简体中文</a>
+
 ## Installation Instructions
 
 1. Install the libraries:
