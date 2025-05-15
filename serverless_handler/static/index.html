@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <title>轻松分离 PDF 的黑白与彩色页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            display: flex;
+            padding-bottom: 60px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            /* background-color: #fff; */
+            padding: 20px 100px;
+            border-radius: 5px;
+            /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+        }
+
+        h1 {
+            margin-top: 35px;
+            text-align: center;
+            color: #333;
+        }
+
+        .section {
+            /* margin-bottom: 20px; */
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            margin-top: 55px;
+            background-color: #fff;
+        }
+
+        .section h2 {
+            margin: 5px 0 10px 0;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input,
+        button {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #1296db;
+            box-shadow: 0 0 5px rgba(18, 150, 219, 0.3);
+        }
+
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+            accent-color: #1296db;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            background-color: #f8f8f8;
+            cursor: pointer;
+        }
+
+        input[type="file"]:hover {
+            background-color: #f0f0f0;
+        }
+
+        button {
+            background-color: #1296db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            height: 40px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background-color: #0f85c7;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(18, 150, 219, 0.2);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin-top: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar {
+            height: 25px;
+            background-color: #1296db;
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+            text-align: center;
+            color: white;
+            line-height: 25px;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 5px;
+            background-color: #f8f8f8;
+            min-height: 60px;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .download-btn {
+            margin-top: 10px;
+            background-color: #1296db;
+        }
+
+        .parameter-inputs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .parameter-inputs .input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /* 步骤条样式 */
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+
+        .steps::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ddd;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        .step {
+            position: relative;
+            z-index: 2;
+            background: white;
+            padding: 10px;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid #ddd;
+            transition: all 0.3s;
+        }
+
+        .step.active {
+            border-color: #1296db;
+            background: #1296db;
+            color: white;
+        }
+
+        .step.completed {
+            border-color: #1296db;
+            color: #1296db;
+        }
+
+        .step.active .step-label {
+            color: #1296db;
+            font-weight: bold;
+        }
+
+        .step-label {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 10px;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .icon {
+            text-align: center;
+            margin: 10px auto 0px auto;
+            width: 100px;
+            height: 100px;
+        }
+
+        /* 页脚样式 */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px 0;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            border-top: 1px solid #eee;
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+
+        .footer a {
+            color: #1296db;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #0f85c7;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-divider {
+            color: #ddd;
+        }
+
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #666;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-button {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .modal-button.primary {
+            background-color: #1296db;
+            color: white;
+        }
+
+        .modal-button.secondary {
+            background-color: #f5f5f5;
+            color: #666;
+        }
+
+        .modal-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 添加弹窗组件 -->
+    <div class="modal" id="star-modal">
+        <div class="modal-content">
+            <div class="modal-title">感谢使用！</div>
+            <div class="modal-text">
+                如果这个工具对你有帮助，请考虑在 GitHub 上为我点个 Star ⭐️，这将是对我最大的支持！
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-button primary" id="star-button">去点赞</button>
+                <button class="modal-button secondary" id="skip-button">下次一定</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="icon">
+            <svg t="1747276191608" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                p-id="8515" width="100" height="100">
+                <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#1296db" />
+                        <stop offset="100%" stop-color="#21E5A8" />
+                    </linearGradient>
+                </defs>
+                <path
+                    d="M885.76 209.408l-64.512-11.776c-23.552-4.096-46.592-27.136-51.2-50.688L758.272 87.04c-4.608-23.552-11.776-23.552-16.384 0l-11.264 59.904c-4.608 23.552-27.648 46.592-51.2 50.688l-64.512 11.776c-23.552 4.096-23.552 11.264 0 15.872l64.512 11.776c23.552 4.096 46.08 27.136 50.176 51.2l13.312 80.384c4.096 23.552 10.24 23.552 14.336 0l13.312-80.384c4.096-23.552 26.624-46.592 50.176-51.2l64.512-11.776c24.064-4.096 24.064-11.264 0.512-15.872z m-302.08 181.248c-3.072 16.896-19.456 32.768-36.352 35.84L501.76 434.688c-16.896 3.072-16.896 8.192 0 11.264l45.568 8.192c16.896 3.072 32.768 19.456 35.328 35.84l9.216 56.832c2.56 16.896 7.168 16.896 10.24 0l9.216-56.832c2.56-16.896 18.944-33.28 35.328-35.84l45.568-8.192c16.896-3.072 16.896-8.192 0-11.264l-45.568-8.192c-16.896-3.072-33.28-19.456-36.352-35.84l-7.68-42.496c-3.072-16.896-8.192-16.896-11.264 0l-7.68 42.496z"
+                    style="fill:url(#gradient)" p-id="8516"></path>
+                <path
+                    d="M856.064 317.952c-10.752 0-19.456 8.704-19.456 19.456v400.384c0 42.496-34.816 77.312-77.312 77.312H335.36c-42.496 0-77.312-34.816-77.312-77.312V221.696c0-42.496 34.816-77.312 77.312-77.312h272.384c10.752 0 19.456-8.704 19.456-19.456s-8.704-19.456-19.456-19.456H335.36c-60.416 0-109.568 46.08-115.2 104.96-2.048-0.512-4.096 0-6.656 0.512-25.6 5.632-48.64 19.968-65.024 39.936-16.896 20.48-26.112 46.592-26.112 73.216v475.648c0 86.016 70.144 156.16 156.16 156.16h384c57.344 0 106.496-43.008 114.688-99.328v-4.096c55.808-8.704 98.304-56.832 98.304-114.688V337.408c0-10.752-8.704-19.456-19.456-19.456z m-194.048 599.552h-384c-31.232 0-60.416-12.288-82.944-34.304-22.528-22.016-34.304-51.712-34.304-82.944V324.608c0-35.328 24.576-66.56 58.368-74.752v488.448c0 64 52.224 116.224 116.224 116.224h402.944c-6.656 35.328-38.912 62.976-76.288 62.976z"
+                    style="fill:url(#gradient)" p-id="8517"></path>
+            </svg>
+        </div>
+        <h1>仅需三步，轻松分离 PDF 的黑白与彩色页面</h1>
+
+        <div class="steps">
+            <div class="step active" data-step="1">
+                1
+                <span class="step-label">上传文件</span>
+            </div>
+            <div class="step" data-step="2">
+                2
+                <span class="step-label">处理文件</span>
+            </div>
+            <div class="step" data-step="3">
+                3
+                <span class="step-label">下载文件</span>
+            </div>
+        </div>
+
+        <div class="section active" id="upload-section">
+            <h2>上传 PDF 文件</h2>
+            <div class="input-group">
+                <label for="file-input">选择或拖拽 PDF 文件至此 (最大支持 512MB):</label>
+                <input type="file" id="file-input" accept=".pdf" />
+            </div>
+            <button type="button" id="upload-btn" disabled>上传文件</button>
+            <div class="progress-container hidden" id="upload-progress-container">
+                <div class="progress-bar" id="upload-progress-bar">0%</div>
+            </div>
+            <div class="status" id="upload-status"></div>
+            <div style="text-align: center; color: #666; font-size: 14px; margin-top: 10px;">请放心，你上传和处理的文件仅在此会话内有效，我们不会以任何形式保存。</div>
+        </div>
+
+        <div class="section" id="process-section">
+            <h2>处理 PDF</h2>
+            <div class="parameter-inputs">
+                <div class="input-group">
+                    <label for="double-sided">双面打印模式:</label>
+                    <input type="checkbox" id="double-sided" checked />
+                </div>
+                <div class="input-group">
+                    <label for="saturation-threshold">饱和度阈值 (0-1):</label>
+                    <input type="number" id="saturation-threshold" min="0" max="1" step="0.01" value="0.35" />
+                </div>
+                <div class="input-group">
+                    <label for="color-fraction-threshold">色彩比例阈值 (0-1):</label>
+                    <input type="number" id="color-fraction-threshold" min="0" max="1" step="0.0001" value="0.001" />
+                </div>
+            </div>
+            <button type="button" id="process-btn">开始处理</button>
+            <div class="progress-container hidden" id="progress-container">
+                <div class="progress-bar" id="progress-bar">0%</div>
+            </div>
+            <div class="status" id="process-status"></div>
+            <div class="help" style="margin-top: 20px;">
+                <h3>帮助</h3>
+                <p>
+                    双面打印模式：如果你的文件是双面打印的，请勾选此选项。我们会将与彩色页面相邻的页面也视为彩色，以确保最终打印完的文档可以正确地合并。
+                </p>
+                <p>
+                    饱和度阈值：使用饱和度来判断页面是否为彩色页面。饱和度阈值越小，越多的页面会被视为彩色页面。
+                </p>
+                <p>
+                    色彩比例阈值：使用色彩比例来判断页面是否为彩色页面。色彩比例阈值越小，越多的页面会被视为彩色页面。
+                </p>
+            </div>
+        </div>
+
+        <div class="section" id="download-section">
+            <h2>下载处理后的文件</h2>
+            <button type="button" id="download-color-btn" class="download-btn">下载彩色页面 PDF</button>
+            <button type="button" id="download-bw-btn" class="download-btn">下载黑白页面 PDF</button>
+            <div class="status" id="download-status"></div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <span>© 2025 Color-BW-Separator-for-PDF</span>
+            <span class="footer-divider">|</span>
+            <a href="https://beian.miit.gov.cn/" style="color: #8E836D" target="_blank">苏ICP备2021006745号</a>
+            <span class="footer-divider">|</span>
+            <span>作者：<a href="https://github.com/RicePasteM" target="_blank">RicePasteM</a></span>
+            <span class="footer-divider">|</span>
+            <a href="https://github.com/RicePasteM/Color-BW-Separator-for-PDF" target="_blank">在 Github 上查看源码</a>
+        </div>
+    </footer>
+
+    <script>
+        // 全局变量
+        let ws = null;
+        let currentFile = null;
+        let isProcessed = false;
+        let colorPdfUrl = null;
+        let bwPdfUrl = null;
+        let currentStep = 1;
+
+        // DOM 元素
+        const uploadBtn = document.getElementById('upload-btn');
+        const processBtn = document.getElementById('process-btn');
+        const downloadColorBtn = document.getElementById('download-color-btn');
+        const downloadBwBtn = document.getElementById('download-bw-btn');
+
+        const uploadStatus = document.getElementById('upload-status');
+        const processStatus = document.getElementById('process-status');
+        const downloadStatus = document.getElementById('download-status');
+
+        const fileInput = document.getElementById('file-input');
+        const uploadProgressContainer = document.getElementById('upload-progress-container');
+        const uploadProgressBar = document.getElementById('upload-progress-bar');
+        const progressContainer = document.getElementById('progress-container');
+        const progressBar = document.getElementById('progress-bar');
+
+        const uploadSection = document.getElementById('upload-section');
+        const processSection = document.getElementById('process-section');
+        const downloadSection = document.getElementById('download-section');
+
+        const doubleSidedCheck = document.getElementById('double-sided');
+        const saturationThreshold = document.getElementById('saturation-threshold');
+        const colorFractionThreshold = document.getElementById('color-fraction-threshold');
+
+        // 步骤切换相关
+        const steps = document.querySelectorAll('.step');
+
+        // 添加弹窗相关变量
+        const starModal = document.getElementById('star-modal');
+        const starButton = document.getElementById('star-button');
+        const skipButton = document.getElementById('skip-button');
+        let hasShownStarModal = false;
+
+        function setActiveStep(stepNumber) {
+            currentStep = stepNumber;
+
+            // 更新步骤样式
+            steps.forEach((step, index) => {
+                const stepNum = index + 1;
+                step.classList.remove('active', 'completed');
+                if (stepNum === currentStep) {
+                    step.classList.add('active');
+                } else if (stepNum < currentStep) {
+                    step.classList.add('completed');
+                }
+            });
+
+            // 显示对应section
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            switch (stepNumber) {
+                case 1:
+                    uploadSection.classList.add('active');
+                    break;
+                case 2:
+                    processSection.classList.add('active');
+                    break;
+                case 3:
+                    downloadSection.classList.add('active');
+                    break;
+            }
+        }
+
+        // 步骤点击事件
+        steps.forEach(step => {
+            step.addEventListener('click', () => {
+                const clickedStep = parseInt(step.dataset.step);
+                if (clickedStep === 1) {
+                    window.location.reload();
+                }
+                if (clickedStep < currentStep) {
+                    setActiveStep(clickedStep);
+                }
+            });
+        });
+
+        // 自动连接WebSocket
+        function connectWebSocket() {
+            try {
+                ws = new WebSocket('wss://1301117745-gi1fhmchtp.ap-guangzhou.tencentscf.com');
+
+                ws.onopen = () => {
+                    console.log('WebSocket连接成功');
+                };
+
+                ws.onclose = () => {
+                    console.log('WebSocket连接断开，5秒后重试...');
+                    setTimeout(connectWebSocket, 5000);
+                };
+
+                ws.onerror = (error) => {
+                    console.error('WebSocket错误:', error);
+                    setTimeout(connectWebSocket, 5000);
+                };
+
+                ws.onmessage = handleMessage;
+            } catch (error) {
+                console.error('无法连接到WebSocket服务器:', error);
+                setTimeout(connectWebSocket, 5000);
+            }
+        }
+
+        // 页面加载时自动连接
+        connectWebSocket();
+
+        // 文件选择监听
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                currentFile = fileInput.files[0];
+                uploadBtn.disabled = false;
+                uploadStatus.textContent = `已选择文件: ${currentFile.name} (${formatFileSize(currentFile.size)})`;
+            } else {
+                uploadBtn.disabled = true;
+                uploadStatus.textContent = '';
+            }
+        });
+
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' bytes';
+            else if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+            else if (bytes < 1024 * 1024 * 1024) return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+            else return (bytes / 1024 / 1024 / 1024).toFixed(2) + ' GB';
+        }
+
+        // 分块上传文件
+        async function uploadFileInChunks(file) {
+            return new Promise((resolve, reject) => {
+                if (!ws || ws.readyState !== WebSocket.OPEN) {
+                    reject(new Error('WebSocket未连接'));
+                    return;
+                }
+
+                const fileName = file.name;
+                const fileSize = file.size;
+                const maxChunkSize = 1 * 1024 * 1024; // 固定5MB
+                const totalChunks = Math.ceil(fileSize / maxChunkSize);
+                let currentChunk = 0;
+
+                // 显示上传进度
+                uploadProgressContainer.classList.remove('hidden');
+                uploadProgressBar.style.width = '0%';
+                uploadProgressBar.textContent = '0%';
+
+                function readAndUploadChunk() {
+                    const start = currentChunk * maxChunkSize;
+                    const end = Math.min(start + maxChunkSize, fileSize);
+                    const chunk = file.slice(start, end);
+
+                    const reader = new FileReader();
+
+                    reader.onload = (e) => {
+                        const chunkData = e.target.result;
+                        const isLastChunk = currentChunk === totalChunks - 1;
+
+                        if (totalChunks === 1) {
+                            ws.send(JSON.stringify({
+                                type: 'upload',
+                                fileName: fileName,
+                                data: chunkData
+                            }));
+                        } else {
+                            ws.send(JSON.stringify({
+                                type: 'upload',
+                                fileName: fileName,
+                                data: chunkData,
+                                chunkIndex: currentChunk,
+                                totalChunks: totalChunks,
+                                isLastChunk: isLastChunk
+                            }));
+                        }
+
+                        currentChunk++;
+
+                        const progress = Math.round((currentChunk / totalChunks) * 100);
+                        uploadProgressBar.style.width = `${progress}%`;
+                        uploadProgressBar.textContent = `${progress}%`;
+
+                        if (currentChunk < totalChunks) {
+                            // 添加300毫秒的延迟
+                            setTimeout(() => {
+                                readAndUploadChunk();
+                            }, 500);
+                        } else {
+                            resolve();
+                        }
+                    };
+
+                    reader.onerror = (error) => {
+                        reject(error);
+                    };
+
+                    reader.readAsDataURL(chunk);
+                }
+
+                readAndUploadChunk();
+            });
+        }
+
+        // 上传文件
+        uploadBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            if (!ws || ws.readyState !== WebSocket.OPEN || !currentFile) {
+                return;
+            }
+
+            uploadBtn.disabled = true;
+            uploadStatus.textContent = '准备上传文件...';
+
+            try {
+                await uploadFileInChunks(currentFile);
+                uploadStatus.textContent = '文件上传中，等待服务器响应...';
+            } catch (error) {
+                uploadStatus.textContent = `上传错误: ${error.message}`;
+                uploadBtn.disabled = false;
+                uploadProgressContainer.classList.add('hidden');
+            }
+        });
+
+        // 处理PDF
+        processBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                return;
+            }
+
+            progressContainer.classList.remove('hidden');
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+
+            processStatus.textContent = '开始处理...';
+            isProcessed = false;
+
+            ws.send(JSON.stringify({
+                type: 'process',
+                isDoubleSided: doubleSidedCheck.checked,
+                saturationThreshold: parseFloat(saturationThreshold.value),
+                colorFractionThreshold: parseFloat(colorFractionThreshold.value)
+            }));
+        });
+
+        // 显示弹窗函数
+        function showStarModal() {
+            if (!hasShownStarModal) {
+                starModal.style.display = 'flex';
+                hasShownStarModal = true;
+            }
+        }
+
+        // 隐藏弹窗函数
+        function hideStarModal() {
+            starModal.style.display = 'none';
+        }
+
+        // 点赞按钮点击事件
+        starButton.addEventListener('click', () => {
+            window.open('https://github.com/RicePasteM/Color-BW-Separator-for-PDF', '_blank');
+            hideStarModal();
+        });
+
+        // 跳过按钮点击事件
+        skipButton.addEventListener('click', hideStarModal);
+
+        // 修改下载按钮点击事件
+        downloadColorBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            if (!colorPdfUrl) {
+                downloadStatus.textContent = '彩色PDF链接不可用';
+                return;
+            }
+
+            downloadStatus.textContent = '正在打开彩色PDF下载链接...';
+            window.open(colorPdfUrl, '_blank');
+            downloadStatus.textContent = '已打开彩色PDF下载链接';
+        });
+
+        downloadBwBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            if (!bwPdfUrl) {
+                downloadStatus.textContent = '黑白PDF链接不可用';
+                return;
+            }
+
+            downloadStatus.textContent = '正在打开黑白PDF下载链接...';
+            window.open(bwPdfUrl, '_blank');
+            downloadStatus.textContent = '已打开黑白PDF下载链接';
+            showStarModal();
+        });
+
+        // 处理服务器消息
+        function handleMessage(event) {
+            try {
+                const data = JSON.parse(event.data);
+                const msgType = data.type;
+
+                switch (msgType) {
+                    case 'upload_response':
+                        uploadBtn.disabled = false;
+                        uploadProgressContainer.classList.add('hidden');
+                        uploadStatus.textContent = data.message;
+                        if (data.status === 'success') {
+                            setActiveStep(2);
+                        }
+                        break;
+
+                    case 'progress':
+                        const percent = Math.round(data.percentage);
+                        progressBar.style.width = `${percent}%`;
+                        progressBar.textContent = `${percent}%`;
+                        processStatus.textContent = `处理中: ${data.current}/${data.total} 页`;
+                        break;
+
+                    case 'process_complete':
+                        progressBar.style.width = '100%';
+                        progressBar.textContent = '100%';
+                        processStatus.textContent = `处理完成! 总页数: ${data.total_pages}, 彩色页: ${data.color_pages}, 黑白页: ${data.bw_pages}`;
+                        isProcessed = true;
+
+                        colorPdfUrl = data.color_pdf_url;
+                        bwPdfUrl = data.bw_pdf_url;
+
+                        downloadColorBtn.disabled = !colorPdfUrl;
+                        downloadBwBtn.disabled = !bwPdfUrl;
+
+                        setActiveStep(3);
+                        break;
+
+                    case 'file_link':
+                        downloadStatus.textContent = `已打开${data.fileType === 'color' ? '彩色' : '黑白'}PDF下载链接`;
+                        window.open(data.url, '_blank');
+                        break;
+
+                    case 'error':
+                        console.error('服务器错误:', data.message);
+                        uploadStatus.textContent = data.message;
+                        processStatus.textContent = data.message;
+                        downloadStatus.textContent = data.message;
+                        uploadBtn.disabled = false;
+                        uploadProgressContainer.classList.add('hidden');
+                        break;
+
+                    default:
+                        console.log('收到未知类型消息:', data);
+                }
+            } catch (error) {
+                console.error('处理消息时出错:', error, event.data);
+            }
+        }
+    </script>
+</body>
+
+</html>

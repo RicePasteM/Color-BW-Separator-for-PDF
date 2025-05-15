@@ -1,6 +1,11 @@
+
+<img src="./serverless_handler/static/favicon.png" alt="Logo" width="100"/>
+
 # Color and Black & White Separator for PDF
 
 This tool is used to separate color and black & white pages from a PDF file into two separate PDF files.
+
+Try our free web version at: [pdf-sep.codesocean.top](https://pdf-sep.codesocean.top)
 
 ## Languages
 <a href="./README-zh_cn.md">简体中文</a>

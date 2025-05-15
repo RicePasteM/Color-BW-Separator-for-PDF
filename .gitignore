@@ -1,0 +1,10 @@
+# 配置文件
+config.toml
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 临时文件
+tmp/ 

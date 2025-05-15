@@ -1,6 +1,10 @@
+<img src="./serverless_handler/static/favicon.png" alt="Logo" width="100"/>
+
 # PDF 彩色和黑白页面分离器
 
 此工具用于将 PDF 文件中的彩色页面和黑白页面分离成两个独立的 PDF 文件。
+
+我们提供免费的Web版本：[pdf-sep.codesocean.top](https://pdf-sep.codesocean.top)
 
 ## 安装说明
 
