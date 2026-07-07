@@ -24,7 +24,7 @@ pip install tqdm
 ```bash
 python main.py
 ```
-3. 通过配置 `IS_DOUBLE_SIZED_PRINTING` 选择是否使用双面打印模式。
+3. 通过配置 `IS_DOUBLE_SIDED_PRINTING` 选择是否使用双面打印模式。
 4. 分离后的彩色页面将保存在 `color_pages.pdf`，黑白页面将保存在 `bw_pages.pdf`。
 
 ## 贡献

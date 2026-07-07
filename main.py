@@ -40,7 +40,7 @@ def is_color_page(page):
     return is_color_image(image)
 
 
-def split_pdf(input_pdf_path, output_color_pdf_path, output_bw_pdf_path, is_double_sized_printing):
+def split_pdf(input_pdf_path, output_color_pdf_path, output_bw_pdf_path, is_double_sided_printing):
     # Open the input PDF
     doc = fitz.open(input_pdf_path)
 
@@ -60,8 +60,8 @@ def split_pdf(input_pdf_path, output_color_pdf_path, output_bw_pdf_path, is_doub
         if is_color_page(page):
             color_pages.append(page_num)
 
-    # Handle double sized printing
-    if is_double_sized_printing:
+    # Handle double-sided printing.
+    if is_double_sided_printing:
         for page_num in color_pages:
             if page_num % 2 == 0 and page_num + 1 not in color_pages and page_num + 1 < len(doc):
                 color_pages.append(page_num + 1)
@@ -93,6 +93,6 @@ if __name__ == '__main__':
     INPUT_PDF_PATH = 'example.pdf'  # 待转换的PDF路径
     OUTPUT_COLOR_PDF_PATH = 'color_pages.pdf'  # 彩色部分PDF输出路径
     OUTPUT_BW_PDF_PATH = 'bw_pages.pdf'  # 黑白部分PDF输出路径
-    IS_DOUBLE_SIZED_PRINTING = True  # 是否双面打印
+    IS_DOUBLE_SIDED_PRINTING = True  # 是否双面打印
 
-    split_pdf(INPUT_PDF_PATH, OUTPUT_COLOR_PDF_PATH, OUTPUT_BW_PDF_PATH, IS_DOUBLE_SIZED_PRINTING)
+    split_pdf(INPUT_PDF_PATH, OUTPUT_COLOR_PDF_PATH, OUTPUT_BW_PDF_PATH, IS_DOUBLE_SIDED_PRINTING)

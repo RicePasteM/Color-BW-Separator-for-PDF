@@ -28,7 +28,7 @@ pip install tqdm
 ```bash
 python main.py
 ```
-3. Choose whether to use double-sized printing mode by configuring `IS_DOUBLE_SIZED_PRINTING`
+3. Choose whether to use double-sided printing mode by configuring `IS_DOUBLE_SIDED_PRINTING`
 4. The separated color pages will be saved in `color_pages.pdf`, and black & white pages will be saved in `bw_pages.pdf`.
 
 ## Contributing
